@@ -77,6 +77,31 @@
   margin: 0 0.35rem;
 }
 
+.toolbar-action {
+  border: 1px solid #cbd5f5;
+  background-color: #e0e7ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.toolbar-action:hover {
+  background-color: #c7d2fe;
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+
+.toolbar-action--secondary {
+  background-color: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+.toolbar-action--secondary:hover {
+  background-color: #ffedd5;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
 .rte-body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -98,17 +123,19 @@
 }
 
 .rte-editor {
-  min-height: 100%;
+  min-height: 420px;
   padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background-color: #ffffff;
   font-size: 1rem;
   line-height: 1.6;
+  flex: 1;
 }
 
 .rte-editor .ProseMirror {
   min-height: 100%;
+  height: 100%;
 }
 
 .rte-editor:focus {
@@ -144,6 +171,40 @@
   padding-left: 1.5rem;
 }
 
+[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.75rem 0;
+}
+
+[data-type='taskItem'] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0.35rem 0;
+  line-height: 1.6;
+}
+
+.task-item-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  margin-top: 0.35rem;
+}
+
+.task-item-label input[type='checkbox'] {
+  accent-color: #2563eb;
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-type='taskItem'] > div {
+  flex: 1;
+}
+
 .rte-editor blockquote {
   border-left: 4px solid #93c5fd;
   margin: 1rem 0;
@@ -152,7 +213,8 @@
   color: #1e3a8a;
 }
 
-.rte-editor code {
+.rte-editor code,
+.rte-output code {
   background-color: #1f2937;
   color: #f8fafc;
   padding: 0.15rem 0.35rem;
@@ -160,13 +222,83 @@
   font-size: 0.95rem;
 }
 
-.rte-editor pre {
+.rte-editor pre,
+.rte-output pre {
   background-color: #111827;
   color: #f3f4f6;
   padding: 1rem;
   border-radius: 0.75rem;
   overflow: auto;
   font-size: 0.95rem;
+}
+
+.rte-editor pre code,
+.rte-output pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.rte-editor table,
+.rte-output table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.95rem;
+}
+
+.rte-editor thead,
+.rte-output thead {
+  background-color: #e0e7ff;
+}
+
+.rte-editor th,
+.rte-editor td,
+.rte-output th,
+.rte-output td {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+}
+
+.rte-editor th,
+.rte-editor td,
+.rte-output th,
+.rte-output td {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  text-align: inherit;
+}
+
+.rte-editor th,
+.rte-output th {
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.rte-editor ul[data-type='taskList'],
+.rte-output ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.rte-editor li[data-type='taskItem'],
+.rte-output li[data-type='taskItem'] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.rte-editor li[data-type='taskItem'] label,
+.rte-output li[data-type='taskItem'] label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+.rte-editor li[data-type='taskItem'] div,
+.rte-output li[data-type='taskItem'] div {
+  flex: 1;
 }
 
 .rte-output {

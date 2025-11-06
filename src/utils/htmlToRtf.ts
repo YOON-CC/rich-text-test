@@ -270,6 +270,17 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
     case 'br':
       return '\\line '
 
+    case 'input': {
+      const inputType = element.getAttribute('type')?.toLowerCase()
+
+      if (inputType === 'checkbox') {
+        const checked = element.hasAttribute('checked')
+        return encodeText(checked ? '☑ ' : '☐ ')
+      }
+
+      return ''
+    }
+
     case 'ul':
     case 'ol': {
       context.listStack.push({ type: tag as 'ul' | 'ol', counter: 0 })

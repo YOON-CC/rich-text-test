@@ -62,7 +62,7 @@ const convertLengthToPx = (value: string | null | undefined) => {
 }
 
 const enhanceRenderedContent = (root: HTMLElement) => {
-  root.querySelectorAll('table').forEach((table) => {
+  root.querySelectorAll<HTMLTableElement>('table').forEach((table) => {
     table.classList.add('rtf-viewer-table')
     table.removeAttribute('border')
     table.style.removeProperty('border')
@@ -73,11 +73,11 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('tr').forEach((row) => {
+  root.querySelectorAll<HTMLTableRowElement>('tr').forEach((row) => {
     row.classList.add('rtf-viewer-table-row')
   })
 
-  root.querySelectorAll('th, td').forEach((cell) => {
+  root.querySelectorAll<HTMLTableCellElement>('th, td').forEach((cell) => {
     cell.classList.add('rtf-viewer-table-cell')
     if (!cell.innerHTML.trim()) {
       cell.innerHTML = '&nbsp;'
@@ -100,7 +100,7 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('thead th').forEach((header) => {
+  root.querySelectorAll<HTMLTableCellElement>('thead th').forEach((header) => {
     header.classList.add('rtf-viewer-table-header')
     if (!header.style.backgroundColor) {
       header.style.setProperty('background-color', '#dde5f7')
@@ -113,7 +113,7 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('ul').forEach((list) => {
+  root.querySelectorAll<HTMLUListElement>('ul').forEach((list) => {
     list.classList.add('rtf-viewer-list')
     if (!list.style.marginLeft) {
       list.style.setProperty('margin-left', '24px')
@@ -123,7 +123,7 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('ol').forEach((list) => {
+  root.querySelectorAll<HTMLOListElement>('ol').forEach((list) => {
     list.classList.add('rtf-viewer-list', 'rtf-viewer-list--ordered')
     if (!list.style.marginLeft) {
       list.style.setProperty('margin-left', '28px')
@@ -133,11 +133,11 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('li').forEach((item) => {
+  root.querySelectorAll<HTMLLIElement>('li').forEach((item) => {
     item.classList.add('rtf-viewer-list-item')
   })
 
-  root.querySelectorAll('p').forEach((paragraph) => {
+  root.querySelectorAll<HTMLParagraphElement>('p').forEach((paragraph) => {
     paragraph.classList.add('rtf-viewer-paragraph')
 
     const indentPx = convertLengthToPx(paragraph.style.textIndent ?? paragraph.style.marginLeft)
@@ -152,15 +152,15 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll('pre').forEach((block) => {
+  root.querySelectorAll<HTMLPreElement>('pre').forEach((block) => {
     block.classList.add('rtf-viewer-pre')
   })
 
-  root.querySelectorAll('code').forEach((inline) => {
+  root.querySelectorAll<HTMLElement>('code').forEach((inline) => {
     inline.classList.add('rtf-viewer-code')
   })
 
-  root.querySelectorAll('blockquote').forEach((quote) => {
+  root.querySelectorAll<HTMLElement>('blockquote').forEach((quote) => {
     quote.classList.add('rtf-viewer-blockquote')
   })
 }

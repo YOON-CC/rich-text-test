@@ -1,0 +1,126 @@
+.markdown-rtf {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.markdown-rtf__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.markdown-rtf__header p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.markdown-rtf__header h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.markdown-rtf__panes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.markdown-rtf__pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.markdown-rtf__pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.markdown-rtf__pane-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.markdown-rtf__hint {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.markdown-rtf__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.markdown-rtf__actions button {
+  border: 1px solid #1d4ed8;
+  background-color: #1d4ed8;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.markdown-rtf__actions button:hover:enabled {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.markdown-rtf__actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.markdown-rtf textarea {
+  width: 100%;
+  min-height: 380px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1rem;
+  font-family: 'Fira Code', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #0f172a;
+  background-color: #f8fafc;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.markdown-rtf textarea:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.markdown-rtf__error {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background-color: rgba(248, 113, 113, 0.1);
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 960px) {
+  .markdown-rtf__panes {
+    grid-template-columns: 1fr;
+  }
+
+  .markdown-rtf textarea {
+    min-height: 220px;
+  }
+}
+
+

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import type { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import HtmlToRtfBrowser from 'html-to-rtf-browser'
 
 import './RichTextEditor.css'
 
@@ -12,7 +13,10 @@ const INITIAL_CONTENT = `
 `
 
 const RichTextEditor = () => {
-  const [htmlOutput, setHtmlOutput] = useState('')
+  const [rtfOutput, setRtfOutput] = useState('')
+  const [error, setError] = useState<string | null>(null)
+
+  const converter = useMemo(() => new HtmlToRtfBrowser(), [])
 
   const editor = useEditor(
     {
@@ -28,10 +32,26 @@ const RichTextEditor = () => {
       ],
       content: INITIAL_CONTENT,
       onCreate: ({ editor: currentEditor }) => {
-        setHtmlOutput(currentEditor.getHTML())
+        try {
+          const html = currentEditor.getHTML()
+          const rtf = converter.convertHtmlToRtf(html)
+          setRtfOutput(rtf)
+          setError(null)
+        } catch (err) {
+          console.error(err)
+          setError('RTF 변환 중 오류가 발생했습니다.')
+        }
       },
       onUpdate: ({ editor: currentEditor }) => {
-        setHtmlOutput(currentEditor.getHTML())
+        try {
+          const html = currentEditor.getHTML()
+          const rtf = converter.convertHtmlToRtf(html)
+          setRtfOutput(rtf)
+          setError(null)
+        } catch (err) {
+          console.error(err)
+          setError('RTF 변환 중 오류가 발생했습니다.')
+        }
       },
     },
     [],
@@ -139,8 +159,12 @@ const RichTextEditor = () => {
       <EditorContent className="rte-editor" editor={editor} />
 
       <div className="rte-output">
-        <h3>HTML 출력</h3>
-        <pre>{htmlOutput}</pre>
+        <div className="rte-output__header">
+          <h3>RTF 출력</h3>
+          <span>전체를 복사해 `.rtf` 파일로 저장하세요.</span>
+        </div>
+        <pre aria-live="polite">{rtfOutput}</pre>
+        {error && <p className="rte-output__error">{error}</p>}
       </div>
     </section>
   )

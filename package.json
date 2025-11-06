@@ -13,6 +13,8 @@
     "@tiptap/extension-placeholder": "^3.10.2",
     "@tiptap/react": "^3.10.2",
     "@tiptap/starter-kit": "^3.10.2",
+    "html-to-rtf-browser": "^1.6.1",
+    "marked": "^16.4.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

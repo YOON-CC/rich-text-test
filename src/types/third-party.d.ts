@@ -19,4 +19,9 @@ declare module 'rtf.js' {
   export const EMFJS: any
 }
 
+declare module 'html2pdf.js' {
+  const html2pdf: any
+  export default html2pdf
+}
+
 

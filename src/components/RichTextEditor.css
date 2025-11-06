@@ -146,9 +146,34 @@
   color: #1f2937;
 }
 
-.rte-output__header span {
+.rte-output__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rte-output__controls button {
+  border: 1px solid #cbd5f5;
+  background-color: #e0e7ff;
+  color: #1e40af;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
   font-size: 0.85rem;
-  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.rte-output__controls button:hover {
+  background-color: #c7d2fe;
+  border-color: #90a4f3;
+  color: #1e3a8a;
+}
+
+.rte-output__controls button.active {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
 }
 
 .rte-output pre {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import type { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -12,6 +12,7 @@ const INITIAL_CONTENT = `<p>hellow</p>`
 const RichTextEditor = () => {
   const [rtfOutput, setRtfOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [previewMode, setPreviewMode] = useState<'rtf' | 'preview'>('preview')
 
   const editor = useEditor(
     {
@@ -58,6 +59,25 @@ const RichTextEditor = () => {
     }
     command(editor)
   }
+
+  const decodedOutput = useMemo(() => {
+    if (!rtfOutput) {
+      return ''
+    }
+
+    return rtfOutput.replace(/\\u(-?\d+)\?/g, (match, value) => {
+      const code = Number.parseInt(value, 10)
+
+      if (Number.isNaN(code)) {
+        return match
+      }
+
+      const normalized = code < 0 ? code + 0x10000 : code
+      return String.fromCodePoint(normalized)
+    })
+  }, [rtfOutput])
+
+  const displayOutput = previewMode === 'preview' ? decodedOutput : rtfOutput
 
   return (
     <section className="rte-container">
@@ -156,8 +176,24 @@ const RichTextEditor = () => {
       <div className="rte-output">
         <div className="rte-output__header">
           <h3>RTF 출력</h3>
+          <div className="rte-output__controls">
+            <button
+              type="button"
+              className={previewMode === 'preview' ? 'active' : ''}
+              onClick={() => setPreviewMode('preview')}
+            >
+              미리보기
+            </button>
+            <button
+              type="button"
+              className={previewMode === 'rtf' ? 'active' : ''}
+              onClick={() => setPreviewMode('rtf')}
+            >
+              RTF 원본
+            </button>
+          </div>
         </div>
-        <pre aria-live="polite">{rtfOutput}</pre>
+        <pre aria-live="polite">{displayOutput}</pre>
         {error && <p className="rte-output__error">{error}</p>}
       </div>
     </section>

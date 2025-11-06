@@ -62,7 +62,7 @@ const RichTextEditor = () => {
   const editorRef = useRef<Editor | null>(null)
   const [rtfOutput, setRtfOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [previewMode, setPreviewMode] = useState<'rtf' | 'preview'>('preview')
+  const [previewMode, ] = useState<'rtf' | 'preview'>('preview')
   const [selectionFontSize, setSelectionFontSize] = useState('')
   const [selectionFontFamily, setSelectionFontFamily] = useState('')
 

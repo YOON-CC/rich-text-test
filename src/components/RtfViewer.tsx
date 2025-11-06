@@ -77,7 +77,8 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     row.classList.add('rtf-viewer-table-row')
   })
 
-  root.querySelectorAll<HTMLTableCellElement>('th, td').forEach((cell) => {
+  root.querySelectorAll('th, td').forEach((cellElement) => {
+    const cell = cellElement as HTMLTableCellElement
     cell.classList.add('rtf-viewer-table-cell')
     if (!cell.innerHTML.trim()) {
       cell.innerHTML = '&nbsp;'
@@ -100,7 +101,8 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll<HTMLTableCellElement>('thead th').forEach((header) => {
+  root.querySelectorAll('thead th').forEach((headerElement) => {
+    const header = headerElement as HTMLTableCellElement
     header.classList.add('rtf-viewer-table-header')
     if (!header.style.backgroundColor) {
       header.style.setProperty('background-color', '#dde5f7')
@@ -113,7 +115,8 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll<HTMLUListElement>('ul').forEach((list) => {
+  root.querySelectorAll('ul').forEach((listElement) => {
+    const list = listElement as HTMLUListElement
     list.classList.add('rtf-viewer-list')
     if (!list.style.marginLeft) {
       list.style.setProperty('margin-left', '24px')
@@ -123,7 +126,8 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll<HTMLOListElement>('ol').forEach((list) => {
+  root.querySelectorAll('ol').forEach((listElement) => {
+    const list = listElement as HTMLOListElement
     list.classList.add('rtf-viewer-list', 'rtf-viewer-list--ordered')
     if (!list.style.marginLeft) {
       list.style.setProperty('margin-left', '28px')
@@ -133,11 +137,13 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll<HTMLLIElement>('li').forEach((item) => {
+  root.querySelectorAll('li').forEach((itemElement) => {
+    const item = itemElement as HTMLLIElement
     item.classList.add('rtf-viewer-list-item')
   })
 
-  root.querySelectorAll<HTMLParagraphElement>('p').forEach((paragraph) => {
+  root.querySelectorAll('p').forEach((paragraphElement) => {
+    const paragraph = paragraphElement as HTMLParagraphElement
     paragraph.classList.add('rtf-viewer-paragraph')
 
     const indentPx = convertLengthToPx(paragraph.style.textIndent ?? paragraph.style.marginLeft)
@@ -152,15 +158,18 @@ const enhanceRenderedContent = (root: HTMLElement) => {
     }
   })
 
-  root.querySelectorAll<HTMLPreElement>('pre').forEach((block) => {
+  root.querySelectorAll('pre').forEach((blockElement) => {
+    const block = blockElement as HTMLPreElement
     block.classList.add('rtf-viewer-pre')
   })
 
-  root.querySelectorAll<HTMLElement>('code').forEach((inline) => {
+  root.querySelectorAll('code').forEach((inlineElement) => {
+    const inline = inlineElement as HTMLElement
     inline.classList.add('rtf-viewer-code')
   })
 
-  root.querySelectorAll<HTMLElement>('blockquote').forEach((quote) => {
+  root.querySelectorAll('blockquote').forEach((quoteElement) => {
+    const quote = quoteElement as HTMLElement
     quote.classList.add('rtf-viewer-blockquote')
   })
 }

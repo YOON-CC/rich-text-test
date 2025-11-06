@@ -39,7 +39,7 @@ function htmlToSectionXml(html: string) {
       if (/^h[1-6]$/.test(tag)) {
         const text = el.textContent ?? "";
         // 앞으로 스타일 적용(h1 크기, bold 등)을 위해 level만 계산해 둔다
-        const level = Number(tag.substring(1)); // 1~6
+        // const level = Number(tag.substring(1)); // 1~6
 
         // 현재 단계: 안전하게 텍스트만 출력 (스타일은 다음 단계에서)
         const run = `<hs:run>${toCharNodes(text)}</hs:run>`;

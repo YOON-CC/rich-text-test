@@ -1,11 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
-import HtmlToRtfBrowser from 'html-to-rtf-browser'
+import { useEffect, useState } from 'react'
 import { marked } from 'marked'
 
 import sampleMarkdown from '../assets/sample-notice.md?raw'
 import './MarkdownToRtf.css'
+import { htmlToRtf } from '../utils/htmlToRtf'
 
 const DEFAULT_MARKDOWN = sampleMarkdown.trim()
+
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+})
 
 const MarkdownToRtf = () => {
   const [markdown, setMarkdown] = useState(DEFAULT_MARKDOWN)
@@ -13,26 +18,17 @@ const MarkdownToRtf = () => {
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const converter = useMemo(() => {
-    marked.setOptions({
-      gfm: true,
-      breaks: true,
-    })
-
-    return new HtmlToRtfBrowser()
-  }, [])
-
   useEffect(() => {
     try {
       const html = marked.parse(markdown) as string
-      const rtfString = converter.convertHtmlToRtf(html)
+      const rtfString = htmlToRtf(html)
       setRtf(rtfString)
       setError(null)
     } catch (err) {
       console.error(err)
       setError('변환 중 오류가 발생했습니다. 마크다운 문법을 확인해 주세요.')
     }
-  }, [markdown, converter])
+  }, [markdown])
 
   useEffect(() => {
     if (!copied) {

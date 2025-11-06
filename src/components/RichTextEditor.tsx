@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import type { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
-import HtmlToRtfBrowser from 'html-to-rtf-browser'
 
 import './RichTextEditor.css'
+import { htmlToRtf } from '../utils/htmlToRtf'
 
 const INITIAL_CONTENT = `
 <h2>TipTap 기반 리치 텍스트 에디터</h2>
@@ -15,8 +15,6 @@ const INITIAL_CONTENT = `
 const RichTextEditor = () => {
   const [rtfOutput, setRtfOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
-
-  const converter = useMemo(() => new HtmlToRtfBrowser(), [])
 
   const editor = useEditor(
     {
@@ -34,7 +32,7 @@ const RichTextEditor = () => {
       onCreate: ({ editor: currentEditor }) => {
         try {
           const html = currentEditor.getHTML()
-          const rtf = converter.convertHtmlToRtf(html)
+          const rtf = htmlToRtf(html)
           setRtfOutput(rtf)
           setError(null)
         } catch (err) {
@@ -45,7 +43,7 @@ const RichTextEditor = () => {
       onUpdate: ({ editor: currentEditor }) => {
         try {
           const html = currentEditor.getHTML()
-          const rtf = converter.convertHtmlToRtf(html)
+          const rtf = htmlToRtf(html)
           setRtfOutput(rtf)
           setError(null)
         } catch (err) {
@@ -161,7 +159,6 @@ const RichTextEditor = () => {
       <div className="rte-output">
         <div className="rte-output__header">
           <h3>RTF 출력</h3>
-          <span>전체를 복사해 `.rtf` 파일로 저장하세요.</span>
         </div>
         <pre aria-live="polite">{rtfOutput}</pre>
         {error && <p className="rte-output__error">{error}</p>}

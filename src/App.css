@@ -1,0 +1,57 @@
+#root {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+header .tag {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.6rem;
+  color: #0f172a;
+}
+
+header .description {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  #root {
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header .description {
+    font-size: 1rem;
+  }
+}

@@ -5,6 +5,7 @@ type ListContext = {
 
 interface RenderContext {
   listStack: ListContext[]
+  tableDepth: number
 }
 
 type FontEntry = {
@@ -123,17 +124,19 @@ const renderNodes = (nodes: NodeListOf<ChildNode>, context: RenderContext): stri
     .map((node) => renderNode(node, context))
     .join('')
 
-const wrapParagraph = (content: string, extra = '') => {
+const wrapParagraph = (content: string, context: RenderContext, extra = '') => {
   const value = content.trim()
 
   if (!value) {
     return ''
   }
 
-  return `{\\pard\\sa200\\sl276\\slmult1\\fs${BASE_FONT_SIZE}${extra ? ` ${extra}` : ''} ${value}\\par}`
+  const tableFlag = context.tableDepth > 0 ? '\\intbl' : ''
+
+  return `{\\pard${tableFlag}\\sa200\\sl276\\slmult1\\fs${BASE_FONT_SIZE}${extra ? ` ${extra}` : ''} ${value}\\par}`
 }
 
-const renderHeading = (tag: 'h1' | 'h2' | 'h3', content: string) => {
+const renderHeading = (tag: 'h1' | 'h2' | 'h3', content: string, context: RenderContext) => {
   const sizes: Record<typeof tag, number> = {
     h1: 48,
     h2: 40,
@@ -146,31 +149,100 @@ const renderHeading = (tag: 'h1' | 'h2' | 'h3', content: string) => {
     return ''
   }
 
-  return `{\\pard\\sa280\\sl276\\slmult1\\b\\fs${sizes[tag]} ${value}\\b0\\fs${BASE_FONT_SIZE}\\par}`
+  const tableFlag = context.tableDepth > 0 ? '\\intbl' : ''
+
+  return `{\\pard${tableFlag}\\sa280\\sl276\\slmult1\\b\\fs${sizes[tag]} ${value}\\b0\\fs${BASE_FONT_SIZE}\\par}`
 }
 
-const renderListItem = (content: string, marker: string) => {
+const renderListItem = (content: string, marker: string, context: RenderContext) => {
   const value = content.trim()
 
   if (!value) {
     return ''
   }
 
-  return `{\\pard\\sa120\\sl276\\slmult1\\li720\\fi-360\\fs${BASE_FONT_SIZE} ${marker}\\tab ${value}\\par}`
+  const tableFlag = context.tableDepth > 0 ? '\\intbl' : ''
+
+  return `{\\pard${tableFlag}\\sa120\\sl276\\slmult1\\li720\\fi-360\\fs${BASE_FONT_SIZE} ${marker}\\tab ${value}\\par}`
 }
 
-const renderTable = (element: HTMLTableElement) => {
-  const rows = Array.from(element.querySelectorAll('tr')).map((row) => {
-    const cells = Array.from(row.children).map((cell) => encodeText((cell.textContent ?? '').trim()))
+const TABLE_DEFAULT_WIDTH = 9000
 
-    if (cells.every((cell) => cell === '')) {
-      return ''
-    }
+const renderTable = (element: HTMLTableElement, context: RenderContext) => {
+  const rows = Array.from(element.querySelectorAll('tr'))
+  if (!rows.length) {
+    return ''
+  }
 
-    return `{\\pard\\sa120\\sl276\\slmult1\\fs${BASE_FONT_SIZE} ${cells.join('\\tab ')}\\par}`
+  const columnCount = rows.reduce((maxCols, row) => {
+    const cells = Array.from(row.children).filter((cell) => {
+      const tagName = cell.tagName.toLowerCase()
+      return tagName === 'td' || tagName === 'th'
+    })
+
+    const totalSpan = cells.reduce((total, cell) => {
+      const colspan = Number.parseInt(cell.getAttribute('colspan') ?? '1', 10)
+      return total + (Number.isFinite(colspan) && colspan > 0 ? colspan : 1)
+    }, 0)
+
+    return Math.max(maxCols, totalSpan)
+  }, 0)
+
+  if (!columnCount) {
+    return ''
+  }
+
+  const columnWidth = Math.floor(TABLE_DEFAULT_WIDTH / columnCount)
+  const columnBoundaries = Array.from({ length: columnCount }, (_, index) => columnWidth * (index + 1))
+
+  const renderedRows = rows
+    .map((row) => renderTableRow(row as HTMLTableRowElement, context, columnBoundaries))
+    .filter(Boolean)
+
+  return renderedRows.join('')
+}
+
+const renderTableRow = (
+  row: HTMLTableRowElement,
+  context: RenderContext,
+  columnBoundaries: number[],
+) => {
+  const cells = Array.from(row.children).filter((cell) => {
+    const tagName = cell.tagName.toLowerCase()
+    return tagName === 'td' || tagName === 'th'
   })
 
-  return rows.filter(Boolean).join('')
+  if (!cells.length) {
+    return ''
+  }
+
+  let columnIndex = 0
+  const boundaries: number[] = []
+
+  const rowContext: RenderContext = {
+    listStack: context.listStack,
+    tableDepth: context.tableDepth + 1,
+  }
+
+  const cellContents = cells.map((cell) => {
+    const colspanAttr = Number.parseInt(cell.getAttribute('colspan') ?? '1', 10)
+    const span = Number.isNaN(colspanAttr) || colspanAttr <= 0 ? 1 : colspanAttr
+    columnIndex += span
+
+    const boundaryIndex = Math.min(columnIndex, columnBoundaries.length) - 1
+    const boundary = columnBoundaries[Math.max(boundaryIndex, 0)]
+    boundaries.push(boundary)
+
+    const inner = renderNodes(cell.childNodes, rowContext).trim() || '\\~'
+    const tagName = cell.tagName.toLowerCase()
+    const styledInner = tagName === 'th' ? `\\b ${inner}\\b0` : inner
+
+    return `${styledInner}\\cell`
+  })
+
+  const rowHeader = `\\trowd\\trgaph108\\trleft0${boundaries.map((value) => `\\cellx${value}`).join('')}`
+
+  return `{${rowHeader}${cellContents.join('')}\\row}\n`
 }
 
 const escapeHref = (href: string) => href.replace(/"/g, '\\"')
@@ -192,7 +264,7 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
     case 'div':
     case 'section':
     case 'article':
-      return wrapParagraph(renderNodes(element.childNodes, context))
+      return wrapParagraph(renderNodes(element.childNodes, context), context)
 
     case 'span': {
       const inner = renderNodes(element.childNodes, context)
@@ -259,13 +331,14 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
     case 'pre': {
       const text = element.textContent ?? ''
       const encoded = encodeText(text)
+      const tableFlag = context.tableDepth > 0 ? '\\intbl' : ''
       return encoded
-        ? `{\\pard\\sa200\\sl276\\slmult1\\f1\\cb1 ${encoded}\\cb0\\f0\\par}`
+        ? `{\\pard${tableFlag}\\sa200\\sl276\\slmult1\\f1\\cb1 ${encoded}\\cb0\\f0\\par}`
         : ''
     }
 
     case 'blockquote':
-      return wrapParagraph(renderNodes(element.childNodes, context), '\\li720\\sl240')
+      return wrapParagraph(renderNodes(element.childNodes, context), context, '\\li720\\sl240')
 
     case 'br':
       return '\\line '
@@ -294,21 +367,21 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
       const inner = renderNodes(element.childNodes, context)
 
       if (!current) {
-        return wrapParagraph(inner)
+        return wrapParagraph(inner, context)
       }
 
       if (current.type === 'ol') {
         current.counter += 1
-        return renderListItem(inner, `${current.counter}.`)
+        return renderListItem(inner, `${current.counter}.`, context)
       }
 
-      return renderListItem(inner, '\\bullet')
+      return renderListItem(inner, '\\bullet', context)
     }
 
     case 'h1':
     case 'h2':
     case 'h3':
-      return renderHeading(tag as 'h1' | 'h2' | 'h3', renderNodes(element.childNodes, context))
+      return renderHeading(tag as 'h1' | 'h2' | 'h3', renderNodes(element.childNodes, context), context)
 
     case 'a': {
       const href = element.getAttribute('href')
@@ -322,7 +395,7 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
     }
 
     case 'table':
-      return renderTable(element as HTMLTableElement)
+      return renderTable(element as HTMLTableElement, context)
 
     case 'hr':
       return '{\\pard\\sa200\\sl276\\slmult1\\fs20 \\emdash\\emdash\\emdash\\emdash\\par}'
@@ -341,7 +414,7 @@ export const htmlToRtf = (html: string) => {
 
   const parser = new DOMParser()
   const documentFragment = parser.parseFromString(html, 'text/html')
-  const context: RenderContext = { listStack: [] }
+  const context: RenderContext = { listStack: [], tableDepth: 0 }
   const content = renderNodes(documentFragment.body.childNodes, context)
 
   return `${RTF_HEADER}${content}${RTF_FOOTER}`

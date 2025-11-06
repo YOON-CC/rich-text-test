@@ -17,6 +17,30 @@
   padding-bottom: 0.75rem;
 }
 
+.font-family-select,
+.font-size-select {
+  min-width: 6rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  background-color: #eef2ff;
+  color: #1e3a8a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.font-family-select:focus,
+.font-size-select:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+}
+
+.font-family-select {
+  min-width: 7.5rem;
+}
+
 .rte-toolbar button {
   border: 1px solid #d1d5db;
   background-color: #f9fafb;

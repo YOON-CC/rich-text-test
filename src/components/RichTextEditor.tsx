@@ -1,18 +1,66 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import type { Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { marked } from 'marked'
 
 import './RichTextEditor.css'
 import { htmlToRtf } from '../utils/htmlToRtf'
+import { FontSize } from '../extensions/fontSize'
+import { FontFamily } from '../extensions/fontFamily'
 
 const INITIAL_CONTENT = `<p>hellow</p>`
 
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+})
+
+const FONT_SIZES = Array.from({ length: 23 }, (_, index) => 10 + index)
+
+const FONT_FAMILIES = [
+  { label: '기본 (기본 폰트)', value: '' },
+  { label: '맑은 고딕', value: 'Malgun Gothic' },
+  { label: '돋움', value: 'Dotum' },
+  { label: '굴림', value: 'Gulim' },
+  { label: '바탕', value: 'Batang' },
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Courier New', value: 'Courier New' },
+  { label: 'Times New Roman', value: 'Times New Roman' },
+]
+
+const parseFontSizeValue = (value?: string | null) => {
+  if (!value) {
+    return ''
+  }
+
+  const numeric = Number.parseFloat(value)
+
+  if (Number.isNaN(numeric)) {
+    return ''
+  }
+
+  return Math.round(numeric).toString()
+}
+
+const parseFontFamilyValue = (value?: string | null) => {
+  if (!value) {
+    return ''
+  }
+
+  const sanitized = value.split(',')[0]?.trim() ?? ''
+  return sanitized.replace(/^['"]|['"]$/g, '')
+}
+
 const RichTextEditor = () => {
+  const editorRef = useRef<Editor | null>(null)
   const [rtfOutput, setRtfOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [previewMode, setPreviewMode] = useState<'rtf' | 'preview'>('preview')
+  const [selectionFontSize, setSelectionFontSize] = useState('')
+  const [selectionFontFamily, setSelectionFontFamily] = useState('')
 
   const editor = useEditor(
     {
@@ -22,12 +70,49 @@ const RichTextEditor = () => {
             levels: [1, 2, 3],
           },
         }),
+        TextStyle.configure({}),
+        FontFamily,
+        FontSize,
         Placeholder.configure({
           placeholder: '내용을 입력하세요…',
         }),
       ],
       content: INITIAL_CONTENT,
+      editorProps: {
+        handlePaste: (_view, event) => {
+          const clipboardData = event.clipboardData
+
+          if (!clipboardData) {
+            return false
+          }
+
+          const htmlData = clipboardData.getData('text/html')
+          const textData = clipboardData.getData('text/plain')
+
+          if (htmlData || !textData?.trim()) {
+            return false
+          }
+
+          const markdown = textData.trim()
+          const converted = marked.parse(markdown) as string
+
+          if (!converted) {
+            return false
+          }
+
+          event.preventDefault()
+          if (editorRef.current) {
+            editorRef.current.commands.insertContent(converted)
+            return true
+          }
+
+          return false
+        },
+      },
       onCreate: ({ editor: currentEditor }) => {
+        editorRef.current = currentEditor
+        setSelectionFontSize(parseFontSizeValue(currentEditor.getAttributes('textStyle').fontSize))
+        setSelectionFontFamily(parseFontFamilyValue(currentEditor.getAttributes('textStyle').fontFamily))
         try {
           const html = currentEditor.getHTML()
           const rtf = htmlToRtf(html)
@@ -39,6 +124,9 @@ const RichTextEditor = () => {
         }
       },
       onUpdate: ({ editor: currentEditor }) => {
+        editorRef.current = currentEditor
+        setSelectionFontSize(parseFontSizeValue(currentEditor.getAttributes('textStyle').fontSize))
+        setSelectionFontFamily(parseFontFamilyValue(currentEditor.getAttributes('textStyle').fontFamily))
         try {
           const html = currentEditor.getHTML()
           const rtf = htmlToRtf(html)
@@ -48,6 +136,11 @@ const RichTextEditor = () => {
           console.error(err)
           setError('RTF 변환 중 오류가 발생했습니다.')
         }
+      },
+      onSelectionUpdate: ({ editor: currentEditor }) => {
+        editorRef.current = currentEditor
+        setSelectionFontSize(parseFontSizeValue(currentEditor.getAttributes('textStyle').fontSize))
+        setSelectionFontFamily(parseFontFamilyValue(currentEditor.getAttributes('textStyle').fontFamily))
       },
     },
     [],
@@ -79,9 +172,69 @@ const RichTextEditor = () => {
 
   const displayOutput = previewMode === 'preview' ? decodedOutput : rtfOutput
 
+  const handleFontSizeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (!editor) {
+      return
+    }
+
+    const value = event.target.value
+
+    if (!value) {
+      editor.chain().focus().unsetFontSize().run()
+      setSelectionFontSize('')
+      return
+    }
+
+    editor.chain().focus().setFontSize(`${value}px`).run()
+    setSelectionFontSize(value)
+  }
+
+  const handleFontFamilyChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (!editor) {
+      return
+    }
+
+    const value = event.target.value
+
+    if (!value) {
+      editor.chain().focus().unsetFontFamily().run()
+      setSelectionFontFamily('')
+      return
+    }
+
+    editor.chain().focus().setFontFamily(value).run()
+    setSelectionFontFamily(value)
+  }
+
   return (
     <section className="rte-container">
       <div className="rte-toolbar" role="toolbar" aria-label="서식 도구">
+        <select
+          className="font-family-select"
+          aria-label="글꼴"
+          value={selectionFontFamily}
+          onChange={handleFontFamilyChange}
+        >
+          {FONT_FAMILIES.map((font) => (
+            <option key={font.label} value={font.value}>
+              {font.label}
+            </option>
+          ))}
+        </select>
+        <select
+          className="font-size-select"
+          aria-label="글자 크기"
+          value={selectionFontSize}
+          onChange={handleFontSizeChange}
+        >
+          <option value="">기본 (16px)</option>
+          {FONT_SIZES.map((size) => (
+            <option key={size} value={size.toString()}>
+              {size}px
+            </option>
+          ))}
+        </select>
+        <span className="divider" aria-hidden="true" />
         <button
           type="button"
           className={editor?.isActive('bold') ? 'active' : ''}

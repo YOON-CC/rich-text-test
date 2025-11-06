@@ -7,9 +7,36 @@ interface RenderContext {
   listStack: ListContext[]
 }
 
+type FontEntry = {
+  index: number
+  definition: string
+  aliases: string[]
+}
+
+const FONT_ENTRIES: FontEntry[] = [
+  { index: 0, definition: '{\\f0\\fnil\\fcharset0 Arial;}', aliases: ['arial', 'sans-serif'] },
+  { index: 1, definition: '{\\f1\\fnil\\fcharset0 Consolas;}', aliases: ['consolas', 'monospace'] },
+  { index: 2, definition: '{\\f2\\fnil\\fcharset129 Malgun Gothic;}', aliases: ['malgun gothic', '맑은 고딕'] },
+  { index: 3, definition: '{\\f3\\fnil\\fcharset129 Gulim;}', aliases: ['gulim', '굴림'] },
+  { index: 4, definition: '{\\f4\\fnil\\fcharset129 Dotum;}', aliases: ['dotum', '돋움'] },
+  { index: 5, definition: '{\\f5\\fnil\\fcharset129 Batang;}', aliases: ['batang', '바탕'] },
+  { index: 6, definition: '{\\f6\\fnil\\fcharset0 Courier New;}', aliases: ['courier new'] },
+  { index: 7, definition: '{\\f7\\fnil\\fcharset0 Times New Roman;}', aliases: ['times new roman', 'serif'] },
+]
+
+const FONT_INDEX_MAP = new Map<string, number>()
+
+FONT_ENTRIES.forEach((entry) => {
+  entry.aliases.forEach((alias) => {
+    FONT_INDEX_MAP.set(alias.toLowerCase(), entry.index)
+  })
+})
+
+const FONT_TABLE_RTF = `{\\fonttbl${FONT_ENTRIES.map((entry) => entry.definition).join('')}}`
+
 const RTF_HEADER = [
   '{\\rtf1\\ansi\\deff0\\uc1',
-  '{\\fonttbl{\\f0\\fnil\\fcharset0 Arial;}{\\f1\\fnil\\fcharset0 Consolas;}}',
+  FONT_TABLE_RTF,
   '{\\colortbl;\\red17\\green45\\blue78;}',
   '\\viewkind4\\paperw11906\\paperh16838\\margl1440\\margr1440',
   '',
@@ -19,6 +46,46 @@ const RTF_FOOTER = '\n}'
 const BASE_FONT_SIZE = 24
 
 const SIGNED_LIMIT = 0x7fff
+
+const convertPxToRtfFontSize = (value: string | null): number | null => {
+  if (!value) {
+    return null
+  }
+
+  const match = value.trim().match(/^([0-9]+(?:\.[0-9]+)?)(px)?$/)
+
+  if (!match) {
+    return null
+  }
+
+  const px = Number.parseFloat(match[1])
+
+  if (Number.isNaN(px)) {
+    return null
+  }
+
+  const points = (px * 72) / 96
+  return Math.max(1, Math.round(points * 2))
+}
+
+const normalizeFontFamilyName = (value: string | null) => {
+  if (!value) {
+    return null
+  }
+
+  const base = value.split(',')[0]?.trim() ?? ''
+  return base.replace(/^['"]|['"]$/g, '').toLowerCase()
+}
+
+const getFontFamilyIndex = (value: string | null): number | null => {
+  const normalized = normalizeFontFamilyName(value)
+
+  if (!normalized) {
+    return null
+  }
+
+  return FONT_INDEX_MAP.get(normalized) ?? null
+}
 
 const encodeText = (text: string) => {
   return Array.from(text.replace(/\r\n/g, '\n'))
@@ -123,8 +190,34 @@ const renderNode = (node: ChildNode, context: RenderContext): string => {
     case 'article':
       return wrapParagraph(renderNodes(element.childNodes, context))
 
-    case 'span':
-      return renderNodes(element.childNodes, context)
+    case 'span': {
+      const inner = renderNodes(element.childNodes, context)
+
+      if (!inner) {
+        return ''
+      }
+
+      const fontSizeToken = convertPxToRtfFontSize(element.style?.fontSize ?? null)
+      const fontFamilyIndex = getFontFamilyIndex(element.style?.fontFamily ?? null)
+
+      if (!fontSizeToken && fontFamilyIndex === null) {
+        return inner
+      }
+
+      const controls: string[] = []
+
+      if (fontFamilyIndex !== null) {
+        controls.push(`\\f${fontFamilyIndex}`)
+      }
+
+      if (fontSizeToken) {
+        controls.push(`\\fs${fontSizeToken}`)
+      }
+
+      const controlString = controls.join('')
+
+      return `{${controlString} ${inner}}`
+    }
 
     case 'strong':
     case 'b': {

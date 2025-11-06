@@ -6,7 +6,7 @@ function App() {
   return (
     <main className="app">
       <header>
-        <h1>마크다웅을 RTF 형식으로 </h1>
+        <h1>마크다운을 RTF 형식으로 </h1>
       </header>
 
       <RichTextEditor />

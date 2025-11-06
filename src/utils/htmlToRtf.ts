@@ -22,6 +22,10 @@ const FONT_ENTRIES: FontEntry[] = [
   { index: 5, definition: '{\\f5\\fnil\\fcharset129 Batang;}', aliases: ['batang', '바탕'] },
   { index: 6, definition: '{\\f6\\fnil\\fcharset0 Courier New;}', aliases: ['courier new'] },
   { index: 7, definition: '{\\f7\\fnil\\fcharset0 Times New Roman;}', aliases: ['times new roman', 'serif'] },
+  { index: 8, definition: '{\\f8\\fnil\\fcharset129 "Noto Sans KR";}', aliases: ['noto sans kr'] },
+  { index: 9, definition: '{\\f9\\fnil\\fcharset129 "Noto Serif KR";}', aliases: ['noto serif kr'] },
+  { index: 10, definition: '{\\f10\\fnil\\fcharset129 "Nanum Gothic";}', aliases: ['nanum gothic'] },
+  { index: 11, definition: '{\\f11\\fnil\\fcharset129 "Nanum Myeongjo";}', aliases: ['nanum myeongjo'] },
 ]
 
 const FONT_INDEX_MAP = new Map<string, number>()

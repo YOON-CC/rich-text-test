@@ -22,6 +22,10 @@ const FONT_SIZES = Array.from({ length: 23 }, (_, index) => 10 + index)
 
 const FONT_FAMILIES = [
   { label: '기본 (기본 폰트)', value: '' },
+  { label: 'Noto Sans KR', value: 'Noto Sans KR' },
+  { label: 'Noto Serif KR', value: 'Noto Serif KR' },
+  { label: 'Nanum Gothic', value: 'Nanum Gothic' },
+  { label: 'Nanum Myeongjo', value: 'Nanum Myeongjo' },
   { label: '맑은 고딕', value: 'Malgun Gothic' },
   { label: '돋움', value: 'Dotum' },
   { label: '굴림', value: 'Gulim' },
@@ -324,30 +328,36 @@ const RichTextEditor = () => {
         </button>
       </div>
 
-      <EditorContent className="rte-editor" editor={editor} />
+      <div className="rte-body">
+        <div className="rte-panel">
+          <EditorContent className="rte-editor" editor={editor} />
+        </div>
 
-      <div className="rte-output">
-        <div className="rte-output__header">
-          <h3>RTF 출력</h3>
-          <div className="rte-output__controls">
-            <button
-              type="button"
-              className={previewMode === 'preview' ? 'active' : ''}
-              onClick={() => setPreviewMode('preview')}
-            >
-              미리보기
-            </button>
-            <button
-              type="button"
-              className={previewMode === 'rtf' ? 'active' : ''}
-              onClick={() => setPreviewMode('rtf')}
-            >
-              RTF 원본
-            </button>
+        <div className="rte-panel">
+          <div className="rte-output">
+            <div className="rte-output__header">
+              {/* <h3>RTF 출력</h3> */}
+              {/* <div className="rte-output__controls">
+                <button
+                  type="button"
+                  className={previewMode === 'preview' ? 'active' : ''}
+                  onClick={() => setPreviewMode('preview')}
+                >
+                  미리보기
+                </button>
+                <button
+                  type="button"
+                  className={previewMode === 'rtf' ? 'active' : ''}
+                  onClick={() => setPreviewMode('rtf')}
+                >
+                  RTF 원본
+                </button>
+              </div> */}
+            </div>
+            <pre aria-live="polite">{displayOutput}</pre>
+            {error && <p className="rte-output__error">{error}</p>}
           </div>
         </div>
-        <pre aria-live="polite">{displayOutput}</pre>
-        {error && <p className="rte-output__error">{error}</p>}
       </div>
     </section>
   )

@@ -77,8 +77,28 @@
   margin: 0 0.35rem;
 }
 
+.rte-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.rte-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  letter-spacing: 0.02em;
+}
+
 .rte-editor {
-  min-height: 420px;
+  min-height: 100%;
   padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -154,6 +174,9 @@
   border-radius: 12px;
   background-color: #f9fafb;
   padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .rte-output__header {
@@ -209,6 +232,7 @@
   color: #0f172a;
   min-height: 420px;
   overflow: auto;
+  flex: 1;
 }
 
 .rte-output__error {
@@ -221,6 +245,10 @@
 }
 
 @media (max-width: 640px) {
+  .rte-body {
+    grid-template-columns: 1fr;
+  }
+
   .rte-container {
     padding: 1rem;
     border-radius: 12px;

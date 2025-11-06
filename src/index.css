@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Gothic:wght@400;700&family=Nanum+Myeongjo:wght@400;700&display=swap');
+
 :root {
-  font-family: 'Inter', 'Pretendard Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Noto Sans KR', 'Inter', 'Pretendard Variable', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
   line-height: 1.6;
   font-weight: 400;
   color: #0f172a;

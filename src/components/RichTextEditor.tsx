@@ -7,10 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import './RichTextEditor.css'
 import { htmlToRtf } from '../utils/htmlToRtf'
 
-const INITIAL_CONTENT = `
-<h2>TipTap 기반 리치 텍스트 에디터</h2>
-<p>왼쪽 상단의 버튼을 눌러 다양한 스타일을 적용해 보세요.</p>
-`
+const INITIAL_CONTENT = `<p>hellow</p>`
 
 const RichTextEditor = () => {
   const [rtfOutput, setRtfOutput] = useState('')

@@ -54,13 +54,17 @@
 }
 
 .rte-editor {
-  min-height: 320px;
+  min-height: 420px;
   padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background-color: #ffffff;
   font-size: 1rem;
   line-height: 1.6;
+}
+
+.rte-editor .ProseMirror {
+  min-height: 100%;
 }
 
 .rte-editor:focus {
@@ -154,6 +158,8 @@
   background: transparent;
   font-size: 0.9rem;
   color: #0f172a;
+  min-height: 420px;
+  overflow: auto;
 }
 
 .rte-output__error {
@@ -181,7 +187,11 @@
   }
 
   .rte-editor {
-    min-height: 260px;
+    min-height: 320px;
+  }
+
+  .rte-output pre {
+    min-height: 320px;
   }
 }
 

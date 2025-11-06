@@ -1,7 +1,7 @@
 #root {
-  max-width: 960px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 4rem;
+  padding: 3.5rem 2rem 4.5rem;
 }
 
 .app {
@@ -23,7 +23,7 @@
   padding: 0.2rem 0.75rem;
   border-radius: 999px;
   background-color: rgba(37, 99, 235, 0.12);
-  color: #1d4ed8;
+  color: #515151;
   font-weight: 600;
   font-size: 0.85rem;
   letter-spacing: 0.02em;

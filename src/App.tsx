@@ -1,6 +1,5 @@
 import './App.css'
 import RichTextEditor from './components/RichTextEditor'
-import MarkdownToRtf from './components/MarkdownToRtf'
 
 function App() {
   return (
@@ -10,8 +9,6 @@ function App() {
       </header>
 
       <RichTextEditor />
-
-      {/* <MarkdownToRtf /> */}
     </main>
   )
 }
